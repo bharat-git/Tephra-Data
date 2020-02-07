@@ -4,11 +4,35 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(mymap);
 
-// L.marker([-35.67, -71.5430]).addTo(mymap)
-//     .bindPopup('A pretty CSS3 popup.<br> Easily customizable.');
+//---------------------------------------------------can have svg as a template -------------------------
+// const markup = `
+// <svg width="580" height="400" xmlns="http://www.w3.org/2000/svg">
+//  <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+//  <g>
+//   <title>background</title>
+//   <rect fill="#fff" id="canvas_background" height="402" width="582" y="-1" x="-1"/>
+//   <g display="none" overflow="visible" y="0" x="0" height="100%" width="100%" id="canvasGrid">
+//    <rect fill="url(#gridpattern)" stroke-width="0" y="0" x="0" height="100%" width="100%"/>
+//   </g>
+//  </g>
+//  <g>
+//   <title>Layer 1</title>
+//   <ellipse ry="117" rx="119.5" id="svg_1" cy="209.453125" cx="232" stroke-width="1.5" stroke="#000" fill="#fff"/>
+//   <ellipse stroke="#000" ry="80.500004" rx="76.5" id="svg_5" cy="209.953128" cx="230" fill-opacity="null" stroke-opacity="null" stroke-width="8" fill="#fff"/>
+//   <ellipse ry="36" rx="35.5" id="svg_6" cy="209.453125" cx="230" fill-opacity="null" stroke-opacity="null" stroke-width="3" stroke="#000" fill="#fff"/>
+//   <ellipse id="sample" data-value="popbox" ry="3.5" rx="3.5" id="svg_7" cy="203.953125" cx="113" fill-opacity="null" stroke-opacity="null" stroke-width="9" stroke="#000" fill="#fff" onclick="showAdditionalData()"/>
+//   <ellipse ry="3.5" rx="3.5" id="svg_8" cy="210.953125" cx="231" fill-opacity="null" stroke-opacity="null" stroke-width="9" stroke="#000" fill="#fff"/>
+//   <ellipse ry="3.5" rx="3.5" id="svg_9" cy="121.953125" cx="311" fill-opacity="null" stroke-opacity="null" stroke-width="9" stroke="#000" fill="#fff"/>
+//   <ellipse ry="3.5" rx="3.5" id="svg_10" cy="325.953125" cx="232" fill-opacity="null" stroke-opacity="null" stroke-width="9" stroke="#000" fill="#fff"/>
+//   <ellipse ry="3.5" rx="3.5" id="svg_11" cy="227.953125" cx="201" fill-opacity="null" stroke-opacity="null" stroke-width="9" stroke="#000" fill="#fff"/>
+//   <ellipse ry="3.5" rx="3.5" id="svg_12" cy="229.953125" cx="307" fill-opacity="null" stroke-opacity="null" stroke-width="9" stroke="#000" fill="#fff"/>
+//  </g>
+// </svg>
+// `;
+var volcanos;
+var volcano_data = [];
+var table_data = [];
 
-// L.marker([-41.3025069795548, -72.2701079864054]).addTo(mymap)
-//     .bindPopup('volcanic data');
 
 L.control.scale().addTo(mymap);
 
@@ -17,27 +41,27 @@ var canvas;
 function showAdditionalData() {
 }
 
-var samples = document.getElementById("sample");
-samples.addEventListener('mouseover', function (e) {
-    console.log("on Hover");
-    samples.style.fill = "red";
-    var target = '#' + ($(this).attr('data-value'));
-    $(target).css({ 'top': e.pageY + 10, 'left': e.pageX + 20, 'position': 'absolute', 'border': '1px solid black', 'padding': '5px' });
-    $(target).show();
-});
+// var samples = document.getElementById("sample");
+// samples.addEventListener('mouseover', function (e) {
+//     console.log("on Hover");
+//     samples.style.fill = "red";
+//     var target = '#' + ($(this).attr('data-value'));
+//     $(target).css({ 'top': e.pageY + 10, 'left': e.pageX + 20, 'position': 'absolute', 'border': '1px solid black', 'padding': '5px' });
+//     $(target).show();
+// });
 
-samples.addEventListener('mouseout', function () {
-    console.log("on exit");
-    var target = '#' + ($(this).attr('data-value'));
-    $(target).hide();
-});
+// samples.addEventListener('mouseout', function () {
+//     console.log("on exit");
+//     var target = '#' + ($(this).attr('data-value'));
+//     $(target).hide();
+// });
 
-samples.addEventListener('click', function (e) {
-    var target = '#' + ($(this).attr('data-value'));
-    $(target).hide();
-    //$(target).css({'top':e.pageY+10,'left':e.pageX+20, 'position':'absolute', 'border':'1px solid black', 'padding':'5px'});
-    $(target).show();
-});
+// samples.addEventListener('click', function (e) {
+//     var target = '#' + ($(this).attr('data-value'));
+//     $(target).hide();
+//     $(target).css({ 'top': e.pageY + 10, 'left': e.pageX + 20, 'position': 'absolute', 'border': '1px solid black', 'padding': '5px' });
+//     $(target).show();
+// });
 
 function onMapClick(e) {
     //alert("You clicked the map at " + e.latlng);
@@ -60,6 +84,7 @@ function onMapScroll(e) {
 
 function preload() {
     table = loadTable("TephraData.csv", "csv", "header");
+    table_data = table;
 }
 
 const distinct = (value, index, self) => {
@@ -67,8 +92,71 @@ const distinct = (value, index, self) => {
 }
 
 L.CustomPopup = L.Popup.extend({
-    
-  });
+
+});
+
+function showVolcanicData(volcano, index) {
+    console.log(volcano);
+    var title = d3.select("#dashboard").append("div")
+    .attr("width", 400)
+    .attr("height", 100);
+
+
+    title.append("a",":first-child")
+    .html(volcano_data[index].obj.Volcán);
+
+    var Svg = d3.select("#dashboard").append("svg")
+        .attr("id", "volcanic_data")
+        .attr("width", 400)
+        .attr("height", 400)
+        .classed('centered', true);
+
+    Svg.append("circle")
+    .attr("cx", 100 )
+    .attr("cy", 100 )
+    .attr("r", 20)
+    .attr("fill","none")
+    .attr("stroke","black")
+    .attr("stroke-width", 2)
+    .attr("class", "event1");
+    Svg.append("circle")
+    .attr("cx", 100 )
+    .attr("cy", 100 )
+    .attr("r", 30)
+    .attr("fill","none")
+    .attr("stroke","red")
+    .attr("stroke-width", 5)
+    .attr("class", "event2");
+
+    var box = d3.select(".event2");
+    console.log(box.node().getBBox());
+    var coordinates =  box.node().getBBox();
+
+    Svg.append("circle")
+    .attr("cx", coordinates.x )
+    .attr("cy", coordinates.y )
+    .attr("r", 5)
+    .attr("fill","black")
+    .attr("stroke","black")
+    .attr("class", "event2-Node")
+    .on("click", function(){
+        alert("clicked on a event sample");
+    });
+
+
+}
+
+
+
+$('.volcano_marker').on('click', function (e) {
+    event.preventDefault();  // does nothing since the listener is passive
+    console.log(e.defaultPrevented);
+    // Use the event to find the clicked element
+    console.log("##############");
+    var el = $(e.srcElement || e.target),
+        id = el.attr('id');
+    showVolcanicData(volcanos);
+});
 
 function setup() {
 
@@ -76,21 +164,33 @@ function setup() {
     console.log(table.getColumnCount() + " total columns in table");
     //latitudes = table.getColumn("Latitud");
     //longitudes = table.getColumn("Longitud");
-    var volcanos = table.getColumn("Volcán").filter(distinct);
+    volcanos = table.getColumn("Volcán").filter(distinct);
 
     console.log(volcanos);
 
-    var rows = [];
 
     //to get all unique volcano data for their latitude and longitude.
     for (var i = 0; i < volcanos.length; i++) {
-        rows.push(table.findRow(volcanos[i], "Volcán"));
-        if (rows[i].obj !== null) {
-            var lat = rows[i].obj.Latitud;
-            var lon = rows[i].obj.Longitud;
-            console.log(i+"--"+lat+"  "+lon);
-            L.marker([lat, lon]).addTo(mymap)
-                .bindPopup(volcanos[i]);
+        volcano_data.push(table.findRow(volcanos[i], "Volcán"));
+        if (volcano_data[i].obj !== null) {
+            volcano_data[i].id = volcanos[i];
+            var lat = volcano_data[i].obj.Latitud;
+            var lon = volcano_data[i].obj.Longitud;
+            // console.log(i + "--" + lat + "  " + lon);
+            var volcano = `
+                    <div id="${volcano_data[i].id}" class="volcano_marker">
+                        <h2>
+                            ${volcano_data[i].obj.Longitud}
+                        </h2>
+                        <p class="location">${volcano_data[i].id}</p>
+                        <p class="bio">${volcano_data[i].obj.Magnitud}</p>
+                        <button onclick="showVolcanicData('${volcano_data[i].id}','${i}')">Show More Data</button>
+                    </div>
+                    `;
+            new L.marker([lat, lon]).addTo(mymap)
+                .bindPopup(volcano).on('click', function (e) { console.log("clicked (Try to open Accordion): " + e.target) });
+            ;
+
         }
     }
 
