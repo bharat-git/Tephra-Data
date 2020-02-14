@@ -82,6 +82,24 @@ function onMapScroll(e) {
     // }
 }
 
+function ShowMapView() {
+    console.log("mcbc !!!");
+    d3.select("#mapid").style('display', 'inline-block');
+    d3.select("#dashboard").style('display', 'none');
+
+}
+
+
+function ShowListView() {
+    console.log("list ki ma ka and happy birthtday bhai !!!! !!!");
+    d3.select("#mapid").style('display', 'none');
+    d3.select("#dashboard").style('display', 'inline-block');
+    showAllVolcanoCards();
+
+}
+
+
+
 function preload() {
     table = loadTable("TephraData.csv", "csv", "header");
     table_data = table;
@@ -95,53 +113,68 @@ L.CustomPopup = L.Popup.extend({
 
 });
 
+
+function showAllVolcanoCards() {
+    var i=0;
+    volcano_data.forEach(volcano => {
+        console.log(volcano);
+        showVolcanicData(volcano.id, i);
+        i+=1;
+    });
+}
+
+
 function showVolcanicData(volcano, index) {
     console.log(volcano);
     var title = d3.select("#dashboard").append("div")
-    .attr("width", 400)
-    .attr("height", 100);
+        .attr("class", "card")
+        .attr("id", "card-"+index);
 
 
-    title.append("a",":first-child")
-    .html(volcano_data[index].obj.Volcán);
+    title.append("a", ":first-child")
+        .html(volcano_data[index].obj.Volcán);
 
-    var Svg = d3.select("#dashboard").append("svg")
+    var Svg = d3.select("#card-"+index).append("svg")
         .attr("id", "volcanic_data")
-        .attr("width", 400)
-        .attr("height", 400)
+        .attr("width", 200)
+        .attr("height", 200)
         .classed('centered', true);
 
+
+
     Svg.append("circle")
-    .attr("cx", 100 )
-    .attr("cy", 100 )
-    .attr("r", 20)
-    .attr("fill","none")
-    .attr("stroke","black")
-    .attr("stroke-width", 2)
-    .attr("class", "event1");
+        .attr("cx", 100)
+        .attr("cy", 100)
+        .attr("r", 20)
+        .attr("fill", "none")
+        .attr("stroke", "black")
+        .attr("stroke-width", 2)
+        .attr("class", "event1");
     Svg.append("circle")
-    .attr("cx", 100 )
-    .attr("cy", 100 )
-    .attr("r", 30)
-    .attr("fill","none")
-    .attr("stroke","red")
-    .attr("stroke-width", 5)
-    .attr("class", "event2");
+        .attr("cx", 100)
+        .attr("cy", 100)
+        .attr("r", 30)
+        .attr("fill", "none")
+        .attr("stroke", "red")
+        .attr("stroke-width", 5)
+        .attr("class", "event2");
 
     var box = d3.select(".event2");
-    console.log(box.node().getBBox());
-    var coordinates =  box.node().getBBox();
+   // console.log(box.node().getBBox() + "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+    var coordinates = box.node().getBBox();
 
     Svg.append("circle")
-    .attr("cx", coordinates.x )
-    .attr("cy", coordinates.y )
-    .attr("r", 5)
-    .attr("fill","black")
-    .attr("stroke","black")
-    .attr("class", "event2-Node")
-    .on("click", function(){
-        alert("clicked on a event sample");
-    });
+        .attr("cx", coordinates.x)
+        .attr("cy", coordinates.y)
+        .attr("r", 5)
+        .attr("fill", "black")
+        .attr("stroke", "black")
+        .attr("class", "event2-Node")
+        .on("click", function () {
+            alert("clicked on a event sample");
+        });
+
+    //title.append(Svg);
 
 
 }
@@ -180,9 +213,9 @@ function setup() {
             var volcano = `
                     <div id="${volcano_data[i].id}" class="volcano_marker">
                         <h2>
-                            ${volcano_data[i].obj.Longitud}
+                            ${volcano_data[i].id}
                         </h2>
-                        <p class="location">${volcano_data[i].id}</p>
+                        <p class="location">(${volcano_data[i].obj.Latitud},${volcano_data[i].obj.Longitud}) </p>
                         <p class="bio">${volcano_data[i].obj.Magnitud}</p>
                         <button onclick="showVolcanicData('${volcano_data[i].id}','${i}')">Show More Data</button>
                     </div>

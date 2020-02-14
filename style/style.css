@@ -7,8 +7,9 @@
 }
 
 .row {
-    display: flex;
+    display: inline;
   }
+
   
 .column {
     flex: 50%;
@@ -28,6 +29,41 @@
     box-shadow: 0px 0px 5px 0px rgba(164, 164, 164, 1);
 }
 
+
+.card {
+  border: 1px solid #d3d3d3;
+  border-radius: .25rem;
+}
+
+.volcanoEvents {
+  background-size: cover;
+  min-height: 180px;
+  /* background-position: center;
+  background-color: #ccc; */
+}
+
+.content {
+  padding: 15px;
+}
+
+button {
+  background-color: transparent;
+  border: 1px solid #2196F3;
+  padding: .5rem 1rem;
+  cursor: pointer;
+  border-radius: .25rem;
+}
+
+.card-grid{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 20px;
+}
+
+#dashboard {
+  display: none;
+  margin-left: 20px;
+}
 
 .tephra-map .leaflet-popup-content-wrapper {
   background:#2c3e50;
