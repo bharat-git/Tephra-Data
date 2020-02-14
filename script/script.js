@@ -94,7 +94,7 @@ function ShowListView() {
     console.log("list ki ma ka and happy birthtday bhai !!!! !!!");
     d3.select("#mapid").style('display', 'none');
     d3.select("#dashboard").style('display', 'inline-block');
-    showAllVolcanoCards();
+    //showAllVolcanoCards();
 
 }
 
@@ -123,9 +123,14 @@ function showAllVolcanoCards() {
     });
 }
 
-
+//var columnCount=0;
 function showVolcanicData(volcano, index) {
     console.log(volcano);
+
+    // if(columnCount ===3 ){
+    //     columnCount=0;
+    //     d3.select(".card-group").append("br");
+    // }
     var title = d3.select("#dashboard").append("div")
         .attr("class", "card")
         .attr("id", "card-"+index);
@@ -173,7 +178,6 @@ function showVolcanicData(volcano, index) {
         .on("click", function () {
             alert("clicked on a event sample");
         });
-
     //title.append(Svg);
 
 
@@ -227,7 +231,7 @@ function setup() {
         }
     }
 
-
+    showAllVolcanoCards();
 
     // canvas = createCanvas(640,640);
     // background(100);
