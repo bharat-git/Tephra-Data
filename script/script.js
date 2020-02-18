@@ -32,6 +32,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 var volcanos;
 var volcano_data = [];
 var table_data = [];
+var P_volcano_data = {};
 
 
 L.control.scale().addTo(mymap);
@@ -83,7 +84,7 @@ function onMapScroll(e) {
 }
 
 function ShowMapView() {
-    console.log("mcbc !!!");
+   // console.log("mcbc !!!");
     d3.select("#mapid").style('display', 'inline-block');
     d3.select("#dashboard").style('display', 'none');
 
@@ -91,7 +92,7 @@ function ShowMapView() {
 
 
 function ShowListView() {
-    console.log("list ki ma ka and happy birthtday bhai !!!! !!!");
+   // console.log("list ki ma ka and happy birthtday bhai !!!! !!!");
     d3.select("#mapid").style('display', 'none');
     d3.select("#dashboard").style('display', 'inline-block');
     //showAllVolcanoCards();
@@ -115,95 +116,163 @@ L.CustomPopup = L.Popup.extend({
 
 
 function showAllVolcanoCards() {
-    var i=0;
+    var i = 0;
+    //populateValuesInDropdown();
     volcano_data.forEach(volcano => {
-        console.log(volcano);
+        //console.log(volcano);
         showVolcanicData(volcano.id, i);
-        i+=1;
+        var item = d3.select(".dropdown-menu").append("div")
+        .attr("class", "form-check");
+
+        item.append("input")
+        .attr("type", "checkbox")
+        .attr("class", "check-input")
+        .attr("checked", true)
+        .attr("id", "CB-"+volcano.id);
+
+        item.append("label")
+        .attr("class", "check-label")
+        .html(volcano.id);
+
+        i += 1;
     });
 }
 
 //var columnCount=0;
-function showVolcanicData(volcano, index) {
-    console.log(volcano);
+function showVolcanicData(volcano_name, index) {
 
     // if(columnCount ===3 ){
     //     columnCount=0;
     //     d3.select(".card-group").append("br");
     // }
-    var title = d3.select("#dashboard").append("div")
+    var title = d3.select(".card-grid").append("div")
         .attr("class", "card")
-        .attr("id", "card-"+index);
+        .attr("id", "card-" + index);
 
 
     title.append("a", ":first-child")
         .html(volcano_data[index].obj.Volcán);
 
-    var Svg = d3.select("#card-"+index).append("svg")
+    var Svg = d3.select("#card-" + index).append("svg")
         .attr("id", "volcanic_data")
-        .attr("width", 200)
-        .attr("height", 200)
+        .attr("width", 250)
+        .attr("height", 250)
         .classed('centered', true);
 
-
-
     Svg.append("circle")
-        .attr("cx", 100)
-        .attr("cy", 100)
-        .attr("r", 20)
-        .attr("fill", "none")
-        .attr("stroke", "black")
-        .attr("stroke-width", 2)
-        .attr("class", "event1");
-    Svg.append("circle")
-        .attr("cx", 100)
-        .attr("cy", 100)
-        .attr("r", 30)
-        .attr("fill", "none")
-        .attr("stroke", "red")
-        .attr("stroke-width", 5)
-        .attr("class", "event2");
-
-    var box = d3.select(".event2");
-   // console.log(box.node().getBBox() + "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-    var coordinates = box.node().getBBox();
-
-    Svg.append("circle")
-        .attr("cx", coordinates.x)
-        .attr("cy", coordinates.y)
+        .attr("cx", 125)
+        .attr("cy", 125)
         .attr("r", 5)
         .attr("fill", "black")
-        .attr("stroke", "black")
-        .attr("class", "event2-Node")
-        .on("click", function () {
-            alert("clicked on a event sample");
-        });
+        .attr("stroke", "black");
+
+    //console.log(volcano_name);
+    drawEventCircles(Svg, volcano_name);
+
+
+
+   // var box = d3.select(".event2");
+    // console.log(box.node().getBBox() + "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+   // var coordinates = box.node().getBBox();
+
+
+
+    // ----------------------------------------- this was for the samples-------------------------
+    // Svg.append("circle")
+    //     .attr("cx", coordinates.x)
+    //     .attr("cy", coordinates.y)
+    //     .attr("r", 5)
+    //     .attr("fill", "black")
+    //     .attr("stroke", "black")
+    //     .attr("class", "event2-Node")
+    //     .on("click", function () {
+    //         alert("clicked on a event sample");
+    //     });
+
+
     //title.append(Svg);
 
 
+}
+
+function drawEventCircles(Svg, volcano_name) {
+
+
+    console.log(P_volcano_data[volcano_name].events);
+    var radius = 10;
+    for (var r=0; r < P_volcano_data[volcano_name].events.length; r++ ){
+         
+        Svg.append("circle")
+        .attr("cx", 125)
+        .attr("cy", 125)
+        .attr("r", radius)
+        .attr("fill", "none")
+        .attr("stroke", "black")
+        .attr("stroke-width", 2)
+        .attr("title", P_volcano_data[volcano_name].events[r])
+        .attr("class", "event " + P_volcano_data[volcano_name].events[r]);
+
+        radius+=5;
+    }
+    // Svg.append("circle")
+    //     .attr("cx", 100)
+    //     .attr("cy", 100)
+    //     .attr("r", 20)
+    //     .attr("fill", "none")
+    //     .attr("stroke", "black")
+    //     .attr("stroke-width", 2)
+    //     .attr("class", "event1");
+    // Svg.append("circle")
+    //     .attr("cx", 100)
+    //     .attr("cy", 100)
+    //     .attr("r", 30)
+    //     .attr("fill", "none")
+    //     .attr("stroke", "red")
+    //     .attr("stroke-width", 5)
+    //     .attr("class", "event2");
 }
 
 
 
 $('.volcano_marker').on('click', function (e) {
     event.preventDefault();  // does nothing since the listener is passive
-    console.log(e.defaultPrevented);
+    //console.log(e.defaultPrevented);
     // Use the event to find the clicked element
-    console.log("##############");
+    //console.log("##############");
     var el = $(e.srcElement || e.target),
         id = el.attr('id');
     showVolcanicData(volcanos);
 });
 
 function setup() {
-
-    console.log(table.getRowCount() + " total rows in table");
-    console.log(table.getColumnCount() + " total columns in table");
     //latitudes = table.getColumn("Latitud");
     //longitudes = table.getColumn("Longitud");
     volcanos = table.getColumn("Volcán").filter(distinct);
+    console.log(table);
+    for (var i = 0; i < volcanos.length; i++) {
+        var data = table.getRows().filter(function(index){
+            if(index.obj.Volcán == volcanos[i]) {
+                return index;}
+        });
+        events = [];
+        data.filter(function(v){
+            if(!events.includes(v.obj.Evento)){
+                events.push(v.obj.Evento);
+            }
+        })
+       // console.log(events);
+        var dataElement = {};
+        dataElement['data'] = data;
+        dataElement['events'] = events;
+        P_volcano_data[volcanos[i]] = dataElement;
+    }
 
-    console.log(volcanos);
+    //console.log(P_volcano_data);
+     
+    // var event = table_data.getRows("Evento").filter(function(index){
+    //     if(index.obj.Evento == "Rayhuen") {
+    //         return index;}
+    // });
 
 
     //to get all unique volcano data for their latitude and longitude.
@@ -221,9 +290,10 @@ function setup() {
                         </h2>
                         <p class="location">(${volcano_data[i].obj.Latitud},${volcano_data[i].obj.Longitud}) </p>
                         <p class="bio">${volcano_data[i].obj.Magnitud}</p>
-                        <button onclick="showVolcanicData('${volcano_data[i].id}','${i}')">Show More Data</button>
                     </div>
                     `;
+
+                    // <button onclick="showVolcanicData('${volcano_data[i].id}','${i}')">Show More Data</button>
             new L.marker([lat, lon]).addTo(mymap)
                 .bindPopup(volcano).on('click', function (e) { console.log("clicked (Try to open Accordion): " + e.target) });
             ;
