@@ -54,13 +54,23 @@ button {
 
 .card-grid{
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, 300px);
+  grid-auto-rows: auto;
   grid-gap: 20px;
+}
+
+.event:hover{
+  stroke: #2196F3;
 }
 
 #dashboard {
   display: none;
   margin-left: 20px;
+}
+
+.dropdown-menu{
+  max-height: 300px;
+    overflow-y: scroll;
 }
 
 .tephra-map .leaflet-popup-content-wrapper {
