@@ -127,8 +127,10 @@ function showAllVolcanoCards() {
         item.append("input")
         .attr("type", "checkbox")
         .attr("class", "check-input")
-        .attr("checked", true)
-        .attr("id", "CB-"+volcano.id);
+        .property("checked", true)
+        .attr("id", "CB-"+volcano.id)
+        .attr("onchange", "showOrHideVolcanoCards("+"'" + volcano.id+"'"+")");
+
 
         item.append("label")
         .attr("class", "check-label")
@@ -136,6 +138,14 @@ function showAllVolcanoCards() {
 
         i += 1;
     });
+}
+
+function showOrHideVolcanoCards(volcano_name){
+    console.log(d3.select("#CB-"+ $.escapeSelector(volcano_name)).node().checked);
+    d3.select("#card-" + $.escapeSelector(volcano_name)).style('display','none');
+    if(d3.select("#CB-"+ $.escapeSelector(volcano_name)).node().checked == true){
+        d3.select("#card-" + $.escapeSelector(volcano_name)).style('display','block');
+    }
 }
 
 //var columnCount=0;
@@ -147,21 +157,21 @@ function showVolcanicData(volcano_name, index) {
     // }
     var title = d3.select(".card-grid").append("div")
         .attr("class", "card")
-        .attr("id", "card-" + index);
+        .attr("id", "card-" + volcano_name);
 
 
     title.append("a", ":first-child")
         .html(volcano_data[index].obj.Volcán);
 
-    var Svg = d3.select("#card-" + index).append("svg")
+    var Svg = d3.select("#card-" + $.escapeSelector(volcano_name)).append("svg")
         .attr("id", "volcanic_data")
-        .attr("width", 250)
-        .attr("height", 250)
+        .attr("width", 300)
+        .attr("height", 290)
         .classed('centered', true);
 
     Svg.append("circle")
-        .attr("cx", 125)
-        .attr("cy", 125)
+        .attr("cx", 150)
+        .attr("cy", 145)
         .attr("r", 5)
         .attr("fill", "black")
         .attr("stroke", "black");
@@ -200,19 +210,37 @@ function drawEventCircles(Svg, volcano_name) {
 
     console.log(P_volcano_data[volcano_name].events);
     var radius = 10;
+    var stroke_width = 0;
+    var stroke_color = "red";
+    var radiusMultiplier = 10;
+    if(P_volcano_data[volcano_name].events.length <4 ){
+        radius = 15;
+        stroke_width = 4;
+        radiusMultiplier = 20;
+    }
+    else if(P_volcano_data[volcano_name].events.length <7){
+        radius = 10;
+        stroke_width = 2;
+        radiusMultiplier = 11;
+    }
+    else{
+        radius = 6;
+        stroke_width = 1;
+        radiusMultiplier = 5;
+    }
     for (var r=0; r < P_volcano_data[volcano_name].events.length; r++ ){
          
         Svg.append("circle")
-        .attr("cx", 125)
-        .attr("cy", 125)
+        .attr("cx", 150)
+        .attr("cy", 145)
         .attr("r", radius)
         .attr("fill", "none")
-        .attr("stroke", "black")
-        .attr("stroke-width", 2)
+        .attr("stroke", stroke_color)
+        .attr("stroke-width", stroke_width)
         .attr("title", P_volcano_data[volcano_name].events[r])
         .attr("class", "event " + P_volcano_data[volcano_name].events[r]);
 
-        radius+=5;
+        radius+=radiusMultiplier;
     }
     // Svg.append("circle")
     //     .attr("cx", 100)
