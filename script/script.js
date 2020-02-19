@@ -84,17 +84,19 @@ function onMapScroll(e) {
 }
 
 function ShowMapView() {
-   // console.log("mcbc !!!");
+    // console.log("mcbc !!!");
     d3.select("#mapid").style('display', 'inline-block');
     d3.select("#dashboard").style('display', 'none');
+    d3.select("#VolcanoView").style('display', 'none');
 
 }
 
 
 function ShowListView() {
-   // console.log("list ki ma ka and happy birthtday bhai !!!! !!!");
+    // console.log("list ki ma ka and happy birthtday bhai !!!! !!!");
     d3.select("#mapid").style('display', 'none');
     d3.select("#dashboard").style('display', 'inline-block');
+    d3.select("#VolcanoView").style('display', 'none');
     //showAllVolcanoCards();
 
 }
@@ -115,38 +117,89 @@ L.CustomPopup = L.Popup.extend({
 });
 
 
-function showAllVolcanoCards() {
-    var i = 0;
-    //populateValuesInDropdown();
-    volcano_data.forEach(volcano => {
-        //console.log(volcano);
-        showVolcanicData(volcano.id, i);
-        var item = d3.select(".dropdown-menu").append("div")
+function populateDefaultValuesInDropdown() {
+    var item = d3.select(".dropdown-menu").append("div")
         .attr("class", "form-check");
 
-        item.append("input")
+    item.append("button")
+        .attr("onclick", "clearAllSelection()")
+        .html("Clear all");
+
+    item.append("button")
+        .attr("onclick", "selectAllSelection()")
+        .html("Select all");
+
+}
+
+function populateValuesInDropdown(volcano_name) {
+    var item = d3.select(".dropdown-menu").append("div")
+        .attr("class", "form-check");
+
+    item.append("input")
         .attr("type", "checkbox")
         .attr("class", "check-input")
         .property("checked", true)
-        .attr("id", "CB-"+volcano.id)
-        .attr("onchange", "showOrHideVolcanoCards("+"'" + volcano.id+"'"+")");
+        .attr("id", "CB-" + volcano_name)
+        .attr("onchange", "showOrHideVolcanoCards(" + "'" + volcano_name + "'" + ")");
 
 
-        item.append("label")
+    item.append("label")
         .attr("class", "check-label")
-        .html(volcano.id);
+        .html(volcano_name);
 
+}
+
+function showAllVolcanoCards() {
+    var i = 0;
+    populateDefaultValuesInDropdown();
+    volcano_data.forEach(volcano => {
+        //console.log(volcano);
+        showVolcanicData(volcano.id, i);
+        populateValuesInDropdown(volcano.id);
         i += 1;
     });
 }
 
-function showOrHideVolcanoCards(volcano_name){
-    console.log(d3.select("#CB-"+ $.escapeSelector(volcano_name)).node().checked);
-    d3.select("#card-" + $.escapeSelector(volcano_name)).style('display','none');
-    if(d3.select("#CB-"+ $.escapeSelector(volcano_name)).node().checked == true){
-        d3.select("#card-" + $.escapeSelector(volcano_name)).style('display','block');
+function showOrHideVolcanoCards(volcano_name) {
+    console.log(d3.select("#CB-" + $.escapeSelector(volcano_name)).node().checked);
+    d3.select("#card-" + $.escapeSelector(volcano_name)).style('display', 'none');
+    if (d3.select("#CB-" + $.escapeSelector(volcano_name)).node().checked == true) {
+        d3.select("#card-" + $.escapeSelector(volcano_name)).style('display', 'block');
     }
 }
+
+function clearAllSelection() {
+    d3.selectAll(".card").style('display', 'none');
+    d3.selectAll(".check-input").property("checked", false);
+}
+
+function selectAllSelection() {
+    d3.selectAll(".card").style('display', 'block');
+    d3.selectAll(".check-input").property("checked", true);
+}
+
+function showFullViewOfVolcano(volcano_name) {
+    d3.select("#mapid").style('display', 'none');
+    d3.select("#dashboard").style('display', 'none');
+    d3.select("#VolcanoView").style('display', 'block');
+
+    var box = d3.select("#VolcanoView").node().getBoundingClientRect();
+    var Svg = d3.select(".volcano-visual").append("svg")
+    .attr("id", "volcanic_data")
+    .attr("width", 600)
+    .attr("height", 500)
+    .classed('centered', true);
+
+    Svg.append("circle")
+        .attr("cx", box.width/2)
+        .attr("cy", box.height/2)
+        .attr("r", 10)
+        .attr("fill", "black")
+        .attr("stroke", "black");
+
+
+}
+
 
 //var columnCount=0;
 function showVolcanicData(volcano_name, index) {
@@ -158,10 +211,15 @@ function showVolcanicData(volcano_name, index) {
     var title = d3.select(".card-grid").append("div")
         .attr("class", "card")
         .attr("id", "card-" + volcano_name);
-
-
+        
     title.append("a", ":first-child")
         .html(volcano_data[index].obj.Volcán);
+
+    title.append("button")
+        .attr("width", "100px")
+        .attr("class", "btn btn-secondary btn-sm float-right")
+        .attr("onclick", "showFullViewOfVolcano("+ "'" + volcano_name +"'" +")")
+        .html("full view");
 
     var Svg = d3.select("#card-" + $.escapeSelector(volcano_name)).append("svg")
         .attr("id", "volcanic_data")
@@ -181,9 +239,9 @@ function showVolcanicData(volcano_name, index) {
 
 
 
-   // var box = d3.select(".event2");
+    // var box = d3.select(".event2");
     // console.log(box.node().getBBox() + "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-   // var coordinates = box.node().getBBox();
+    // var coordinates = box.node().getBBox();
 
 
 
@@ -213,34 +271,37 @@ function drawEventCircles(Svg, volcano_name) {
     var stroke_width = 0;
     var stroke_color = "red";
     var radiusMultiplier = 10;
-    if(P_volcano_data[volcano_name].events.length <4 ){
+    if (P_volcano_data[volcano_name].events.length < 4) {
         radius = 15;
         stroke_width = 4;
         radiusMultiplier = 20;
     }
-    else if(P_volcano_data[volcano_name].events.length <7){
+    else if (P_volcano_data[volcano_name].events.length < 7) {
         radius = 10;
         stroke_width = 2;
         radiusMultiplier = 11;
     }
-    else{
+    else {
         radius = 6;
         stroke_width = 1;
         radiusMultiplier = 5;
     }
-    for (var r=0; r < P_volcano_data[volcano_name].events.length; r++ ){
-         
-        Svg.append("circle")
-        .attr("cx", 150)
-        .attr("cy", 145)
-        .attr("r", radius)
-        .attr("fill", "none")
-        .attr("stroke", stroke_color)
-        .attr("stroke-width", stroke_width)
-        .attr("title", P_volcano_data[volcano_name].events[r])
-        .attr("class", "event " + P_volcano_data[volcano_name].events[r]);
+    for (var r = 0; r < P_volcano_data[volcano_name].events.length; r++) {
 
-        radius+=radiusMultiplier;
+        Svg.append("circle")
+            .attr("cx", 150)
+            .attr("cy", 145)
+            .attr("r", radius)
+            .attr("fill", "none")
+            .attr("stroke", stroke_color)
+            .attr("stroke-width", stroke_width)
+            .attr("title", P_volcano_data[volcano_name].events[r])
+            .attr("class", "event " + P_volcano_data[volcano_name].events[r]);
+
+        radius += radiusMultiplier;
+
+        clearAllSelection();
+        selectAllSelection();
     }
     // Svg.append("circle")
     //     .attr("cx", 100)
@@ -278,17 +339,18 @@ function setup() {
     volcanos = table.getColumn("Volcán").filter(distinct);
     console.log(table);
     for (var i = 0; i < volcanos.length; i++) {
-        var data = table.getRows().filter(function(index){
-            if(index.obj.Volcán == volcanos[i]) {
-                return index;}
+        var data = table.getRows().filter(function (index) {
+            if (index.obj.Volcán == volcanos[i]) {
+                return index;
+            }
         });
         events = [];
-        data.filter(function(v){
-            if(!events.includes(v.obj.Evento)){
+        data.filter(function (v) {
+            if (!events.includes(v.obj.Evento)) {
                 events.push(v.obj.Evento);
             }
         })
-       // console.log(events);
+        // console.log(events);
         var dataElement = {};
         dataElement['data'] = data;
         dataElement['events'] = events;
@@ -296,7 +358,7 @@ function setup() {
     }
 
     //console.log(P_volcano_data);
-     
+
     // var event = table_data.getRows("Evento").filter(function(index){
     //     if(index.obj.Evento == "Rayhuen") {
     //         return index;}
@@ -321,7 +383,7 @@ function setup() {
                     </div>
                     `;
 
-                    // <button onclick="showVolcanicData('${volcano_data[i].id}','${i}')">Show More Data</button>
+            // <button onclick="showVolcanicData('${volcano_data[i].id}','${i}')">Show More Data</button>
             new L.marker([lat, lon]).addTo(mymap)
                 .bindPopup(volcano).on('click', function (e) { console.log("clicked (Try to open Accordion): " + e.target) });
             ;

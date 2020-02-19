@@ -65,7 +65,29 @@ button {
 
 #dashboard {
   display: none;
-  margin-left: 20px;
+  margin: 20px;
+}
+
+.volcano-visual{
+  border-color: #000000;
+  border-radius: 5px;
+  border-width: 3px;
+  background: rgb(216, 216, 216);
+  height: 555px;
+}
+
+#VolcanoView {
+  display: none;
+  margin :20px;
+  width: 100%;
+}
+
+.volcano-data{
+  border-color: #000000;
+  border-radius: 6px;
+  border-width: 1px;
+  background: rgb(73, 72, 72);
+  height: 555px;
 }
 
 .dropdown-menu{
