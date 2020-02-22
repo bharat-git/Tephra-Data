@@ -1,4 +1,4 @@
-var mymap = L.map('mapid').setView([-35.67, -71.5430], 5);
+var mymap = L.map('mapid').setView([-39.430254, -71.489618], 6);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -33,6 +33,8 @@ var volcanos;
 var volcano_data = [];
 var table_data = [];
 var P_volcano_data = {};
+var sortedEdadEventsData = {};
+var noEdad = {};
 
 
 L.control.scale().addTo(mymap);
@@ -87,6 +89,7 @@ function ShowMapView() {
     // console.log("mcbc !!!");
     d3.select("#mapid").style('display', 'inline-block');
     d3.select("#dashboard").style('display', 'none');
+    d3.select(".dropdown").style('display', 'none');
     d3.select("#VolcanoView").style('display', 'none');
 
 }
@@ -96,6 +99,7 @@ function ShowListView() {
     // console.log("list ki ma ka and happy birthtday bhai !!!! !!!");
     d3.select("#mapid").style('display', 'none');
     d3.select("#dashboard").style('display', 'inline-block');
+    d3.select(".dropdown").style('display', 'inline-block');
     d3.select("#VolcanoView").style('display', 'none');
     //showAllVolcanoCards();
 
@@ -181,22 +185,156 @@ function selectAllSelection() {
 function showFullViewOfVolcano(volcano_name) {
     d3.select("#mapid").style('display', 'none');
     d3.select("#dashboard").style('display', 'none');
+    d3.select(".dropdown").style('display', 'none');
     d3.select("#VolcanoView").style('display', 'block');
 
-    var box = d3.select("#VolcanoView").node().getBoundingClientRect();
+    d3.selectAll("#volcanic_data_visual").remove();
+
+    var box = d3.select(".volcano-visual").node().getBoundingClientRect();
     var Svg = d3.select(".volcano-visual").append("svg")
-    .attr("id", "volcanic_data")
-    .attr("width", 600)
-    .attr("height", 500)
-    .classed('centered', true);
+        .attr("id", "volcanic_data_visual")
+        .attr("width", 880)
+        .attr("height", 555)
+        .classed('centered', true);
 
     Svg.append("circle")
-        .attr("cx", box.width/2)
-        .attr("cy", box.height/2)
+        .attr("cx", box.width / 2)
+        .attr("cy", box.height / 2)
         .attr("r", 10)
         .attr("fill", "black")
         .attr("stroke", "black");
 
+    drawEnlargedVolcanoData(Svg, volcano_name, box);
+
+}
+
+var Previous_preoperty = {};
+
+function filterEdad(volcano_name, eventName) {
+    var eventData = P_volcano_data[volcano_name].eventsData[eventName];
+
+    var values = [];
+    var min, max, value, final = 0;
+    for (var i = 0; i < eventData.data.length; i++) {
+        var edad = eventData.data[i].obj.Edad;
+        if (edad !== null) {
+            if (!values.includes(edad)) {
+                if (edad !== "") {
+                    values.push(edad);
+                    if (edad.includes("Historic,")) {
+                        value = edad.split(',')[1];
+                        final = new Date().getFullYear() - value;
+                    }
+                }
+            }
+        }
+    }
+    console.log(values);
+    if (values.length > 0 && !(edad.includes("Historic,"))) {
+        max = Math.max.apply(Math, values);
+        min = Math.min.apply(Math, values);
+        final = max + (new Date().getFullYear() - 1950);
+    }
+
+    return {
+        'min': min,
+        'max': max,
+        'Historic': value,
+        'value': final
+    }
+}
+
+
+function drawEnlargedVolcanoData(Svg, volcano_name, box) {
+    // console.log(P_volcano_data[volcano_name].events);
+    var vlcn = P_volcano_data[volcano_name].events;
+    sortedEdadEventsData = {};
+    noEdad = {};
+    var minMaXValues = [];
+    for (var i = 0; i < vlcn.length; i++) {
+
+        // filterEdad(volcano_name, vlcn[i])
+        var p = filterEdad(volcano_name, vlcn[i]);
+        minMaXValues.push(p);
+        if (p.value === 0) {
+            noEdad[vlcn[i]] = p.value;
+        }
+        else {
+            sortedEdadEventsData[p.value] = vlcn[i]
+        }
+    }
+
+    var properties = {
+        'radius': 60,
+        'width': 10,
+        'color': "blue",
+        'radiusMultiplier': 15
+    };
+    console.log(noEdad);
+    console.log(sortedEdadEventsData);
+
+
+    for (var j = 0; j < Object.keys(sortedEdadEventsData).length; j++) {
+        console.log("in the loop ");
+        Svg.append("circle")
+            .attr("cx", box.width / 2)
+            .attr("cy", box.height / 2)
+            .attr("r", properties.radius + (j * properties.radiusMultiplier))
+            .attr("fill", "none")
+            .attr("stroke-width", properties.width)
+            .attr("stroke", properties.color)
+            .attr("id", "fullView-"+sortedEdadEventsData[Object.keys(sortedEdadEventsData)[j]]);
+
+        var eve = document.getElementById("fullView-"+sortedEdadEventsData[Object.keys(sortedEdadEventsData)[j]]);
+
+        eve.addEventListener('mouseover', function (e) {
+            console.log("on Hover");
+            console.log(this);
+            var elm = d3.select("." + $.escapeSelector(this.id));
+            elm.attr("stroke", "green");
+            var target = '#popbox'
+            $(target).css({ 'top': e.pageY + 10, 'left': e.pageX + 20, 'position': 'absolute', 'border': '1px solid black', 'padding': '5px' });
+            $(target).html(this.id.split('-')[1] + `<br>`+ `<b> Edad : `+ Object.keys(sortedEdadEventsData).find(key => sortedEdadEventsData[key] === this.id.split('-')[1]) +`</b>`);
+            $(target).show();
+        });
+
+        eve.addEventListener('mouseout', function () {
+            console.log("on exit");
+            var target = '#popbox';
+            $(target).hide();
+        });
+
+    }
+
+    for (var k = 0; k < Object.keys(noEdad).length; k++) {
+        Svg.append("circle")
+            .attr("cx", box.width / 2)
+            .attr("cy", box.height / 2)
+            .attr("r", properties.radius + ((k + Object.keys(sortedEdadEventsData).length) * properties.radiusMultiplier))
+            .attr("fill", "none")
+            .attr("stroke-width", properties.width)
+            .attr("id", "fullView-"+Object.keys(noEdad)[k])
+            .attr("stroke", 'black');
+
+        var eve = document.getElementById("fullView-"+Object.keys(noEdad)[k]);
+
+        eve.addEventListener('mouseover', function (e) {
+            console.log("on Hover");
+            console.log(this);
+            var elm = d3.select("." + $.escapeSelector(this.id));
+            elm.attr("stroke", "green");
+            var target = '#popbox'
+            $(target).css({ 'top': e.pageY + 10, 'left': e.pageX + 20, 'position': 'absolute', 'border': '1px solid black', 'padding': '5px' });
+            $(target).html(this.id.split('-')[1] + `<br>`+ `<b> Edad : `+ Object.keys(noEdad).find(key => noEdad[key] === this.id.split('-')[1]) +`</b>`);
+            $(target).show();
+        });
+
+        eve.addEventListener('mouseout', function () {
+            console.log("on exit");
+            var target = '#popbox';
+            $(target).hide();
+        });
+    }
 
 }
 
@@ -211,18 +349,17 @@ function showVolcanicData(volcano_name, index) {
     var title = d3.select(".card-grid").append("div")
         .attr("class", "card")
         .attr("id", "card-" + volcano_name);
-        
+
     title.append("a", ":first-child")
         .html(volcano_data[index].obj.Volcán);
 
     title.append("button")
         .attr("width", "100px")
         .attr("class", "btn btn-secondary btn-sm float-right")
-        .attr("onclick", "showFullViewOfVolcano("+ "'" + volcano_name +"'" +")")
+        .attr("onclick", "showFullViewOfVolcano(" + "'" + volcano_name + "'" + ")")
         .html("full view");
 
     var Svg = d3.select("#card-" + $.escapeSelector(volcano_name)).append("svg")
-        .attr("id", "volcanic_data")
         .attr("width", 300)
         .attr("height", 290)
         .classed('centered', true);
@@ -266,27 +403,35 @@ function showVolcanicData(volcano_name, index) {
 function drawEventCircles(Svg, volcano_name) {
 
 
-    console.log(P_volcano_data[volcano_name].events);
+    //console.log(P_volcano_data[volcano_name].events);
     var radius = 10;
     var stroke_width = 0;
     var stroke_color = "red";
     var radiusMultiplier = 10;
     if (P_volcano_data[volcano_name].events.length < 4) {
+        radius = 25;
+        stroke_width = 20;
+        radiusMultiplier = 40;
+    }
+    else if (P_volcano_data[volcano_name].events.length < 8) {
         radius = 15;
-        stroke_width = 4;
+        stroke_width = 10;
         radiusMultiplier = 20;
     }
-    else if (P_volcano_data[volcano_name].events.length < 7) {
-        radius = 10;
-        stroke_width = 2;
-        radiusMultiplier = 11;
+    else if (P_volcano_data[volcano_name].events.length < 15) {
+        radius = 15;
+        stroke_width = 5;
+        radiusMultiplier = 10;
     }
     else {
         radius = 6;
         stroke_width = 1;
         radiusMultiplier = 5;
     }
+
     for (var r = 0; r < P_volcano_data[volcano_name].events.length; r++) {
+
+        var event_name = (P_volcano_data[volcano_name].events[r] == "Unknown") ? "unknown " + volcano_name : P_volcano_data[volcano_name].events[r];
 
         Svg.append("circle")
             .attr("cx", 150)
@@ -295,9 +440,28 @@ function drawEventCircles(Svg, volcano_name) {
             .attr("fill", "none")
             .attr("stroke", stroke_color)
             .attr("stroke-width", stroke_width)
-            .attr("title", P_volcano_data[volcano_name].events[r])
-            .attr("class", "event " + P_volcano_data[volcano_name].events[r]);
+            .attr("id", event_name)
+            .attr("class", "event ");
 
+
+        var eve = document.getElementById(event_name);
+
+        eve.addEventListener('mouseover', function (e) {
+            console.log("on Hover");
+            console.log(this);
+            var elm = d3.select("." + $.escapeSelector(this.id));
+            elm.attr("stroke", "green");
+            var target = '#popbox'
+            $(target).css({ 'top': e.pageY + 10, 'left': e.pageX + 20, 'position': 'absolute', 'border': '1px solid black', 'padding': '5px' });
+            $(target).html(this.id.includes("unknown") ? "unknown" : this.id);
+            $(target).show();
+        });
+
+        eve.addEventListener('mouseout', function () {
+            console.log("on exit");
+            var target = '#popbox';
+            $(target).hide();
+        });
         radius += radiusMultiplier;
 
         clearAllSelection();
@@ -349,15 +513,46 @@ function setup() {
             if (!events.includes(v.obj.Evento)) {
                 events.push(v.obj.Evento);
             }
-        })
+        });
         // console.log(events);
         var dataElement = {};
         dataElement['data'] = data;
         dataElement['events'] = events;
+
+
+        var temp = [];
+        var elem = {};
+
+        for (var j = 0; j < events.length; j++) {
+            var Sección = [];
+            temp = data.filter(function (v) {
+                if (events[j] === v.obj.Evento) {
+                    return v;
+                }
+            });
+            var obj = {};
+            obj['data'] = temp
+            //elem[events[j]] = temp;
+
+            temp.filter(function (v) {
+                if (!Sección.includes(v.obj.Sección)) {
+                    Sección.push(v.obj.Sección);
+                }
+            });
+            obj['Seccións'] = Sección;
+
+            elem[events[j]] = obj;
+
+        }
+        dataElement['eventsData'] = elem;
+
+
+        elem
+
         P_volcano_data[volcanos[i]] = dataElement;
     }
 
-    //console.log(P_volcano_data);
+    console.log(P_volcano_data);
 
     // var event = table_data.getRows("Evento").filter(function(index){
     //     if(index.obj.Evento == "Rayhuen") {
