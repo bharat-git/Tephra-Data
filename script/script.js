@@ -230,7 +230,7 @@ function filterEdad(volcano_name, eventName) {
         }
     }
     console.log(values);
-    if (values.length > 0 && !(edad.includes("Historic,"))) {
+    if (values.length > 0 && !(values[0].includes("Historic,"))) {
         max = Math.max.apply(Math, values);
         min = Math.min.apply(Math, values);
         final = max + (new Date().getFullYear() - 1950);
@@ -283,9 +283,9 @@ function drawEnlargedVolcanoData(Svg, volcano_name, box) {
             .attr("fill", "none")
             .attr("stroke-width", properties.width)
             .attr("stroke", properties.color)
-            .attr("id", "fullView-"+sortedEdadEventsData[Object.keys(sortedEdadEventsData)[j]]);
+            .attr("id", "fullView*"+sortedEdadEventsData[Object.keys(sortedEdadEventsData)[j]]);
 
-        var eve = document.getElementById("fullView-"+sortedEdadEventsData[Object.keys(sortedEdadEventsData)[j]]);
+        var eve = document.getElementById("fullView*"+sortedEdadEventsData[Object.keys(sortedEdadEventsData)[j]]);
 
         eve.addEventListener('mouseover', function (e) {
             console.log("on Hover");
@@ -294,7 +294,7 @@ function drawEnlargedVolcanoData(Svg, volcano_name, box) {
             elm.attr("stroke", "green");
             var target = '#popbox'
             $(target).css({ 'top': e.pageY + 10, 'left': e.pageX + 20, 'position': 'absolute', 'border': '1px solid black', 'padding': '5px' });
-            $(target).html(this.id.split('-')[1] + `<br>`+ `<b> Edad : `+ Object.keys(sortedEdadEventsData).find(key => sortedEdadEventsData[key] === this.id.split('-')[1]) +`</b>`);
+            $(target).html(this.id.split('*')[1] + `<br>`+ `<b> Edad : `+ Object.keys(sortedEdadEventsData).find(key => sortedEdadEventsData[key] === this.id.split('*')[1]) +`</b>`);
             $(target).show();
         });
 
@@ -313,10 +313,10 @@ function drawEnlargedVolcanoData(Svg, volcano_name, box) {
             .attr("r", properties.radius + ((k + Object.keys(sortedEdadEventsData).length) * properties.radiusMultiplier))
             .attr("fill", "none")
             .attr("stroke-width", properties.width)
-            .attr("id", "fullView-"+Object.keys(noEdad)[k])
+            .attr("id", "fullView*"+Object.keys(noEdad)[k])
             .attr("stroke", 'black');
 
-        var eve = document.getElementById("fullView-"+Object.keys(noEdad)[k]);
+        var eve = document.getElementById("fullView*"+Object.keys(noEdad)[k]);
 
         eve.addEventListener('mouseover', function (e) {
             console.log("on Hover");
@@ -325,7 +325,7 @@ function drawEnlargedVolcanoData(Svg, volcano_name, box) {
             elm.attr("stroke", "green");
             var target = '#popbox'
             $(target).css({ 'top': e.pageY + 10, 'left': e.pageX + 20, 'position': 'absolute', 'border': '1px solid black', 'padding': '5px' });
-            $(target).html(this.id.split('-')[1] + `<br>`+ `<b> Edad : `+ Object.keys(noEdad).find(key => noEdad[key] === this.id.split('-')[1]) +`</b>`);
+            $(target).html(this.id.split('*')[1] + `<br>`+ `<b> Edad : `+ Object.keys(noEdad).find(key => noEdad[key] === this.id.split('*')[1]) +`</b>`);
             $(target).show();
         });
 
