@@ -96,6 +96,18 @@ button {
   border-width: 1px;
   background: rgb(73, 72, 72);
   height: 555px;
+  text-align: center;
+}
+
+.card-data{
+  border-radius: 6px;
+  border-width: 1px;
+  background: rgb(255, 255, 255);
+  width: 80%;
+  height: 86%;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  display: inline-block;
 }
 
 .dropdown {
