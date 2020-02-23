@@ -35,6 +35,7 @@ var table_data = [];
 var P_volcano_data = {};
 var sortedEdadEventsData = {};
 var noEdad = {};
+var avgMagnitudeforEvent = {};
 
 
 L.control.scale().addTo(mymap);
@@ -197,6 +198,14 @@ function showFullViewOfVolcano(volcano_name) {
         .attr("height", 555)
         .classed('centered', true);
 
+    var defs = Svg.append("defs");
+
+    var filter = defs.append("filter")
+        .attr("id", "blur-" + volcano_name);
+
+    filter.append("feGaussianBlur")
+        .attr("stdDeviation", 3);
+
     Svg.append("circle")
         .attr("cx", box.width / 2)
         .attr("cy", box.height / 2)
@@ -205,15 +214,20 @@ function showFullViewOfVolcano(volcano_name) {
         .attr("stroke", "black");
 
     drawEnlargedVolcanoData(Svg, volcano_name, box);
+    populateDataOnCard(volcano_name);
 
 }
 
-var Previous_preoperty = {};
+function populateDataOnCard(volcano_name) {
 
-function filterEdad(volcano_name, eventName) {
+
+}
+
+function filterEvents(volcano_name, eventName) {
     var eventData = P_volcano_data[volcano_name].eventsData[eventName];
 
     var values = [];
+    var magnitudes = [];
     var min, max, value, final = 0;
     for (var i = 0; i < eventData.data.length; i++) {
         var edad = eventData.data[i].obj.Edad;
@@ -228,6 +242,10 @@ function filterEdad(volcano_name, eventName) {
                 }
             }
         }
+        var mag = eventData.data[i].obj.Magnitud;
+        if (mag !== "" && !(magnitudes.includes(mag))) {
+            magnitudes.push(mag);
+        }
     }
     console.log(values);
     if (values.length > 0 && !(values[0].includes("Historic,"))) {
@@ -236,33 +254,54 @@ function filterEdad(volcano_name, eventName) {
         final = max + (new Date().getFullYear() - 1950);
     }
 
+    var average;
+    var sum = 0;
+    var divider = 0
+    if (magnitudes.length > 0) {
+        for (var i = 0; i < magnitudes.length; i++) {
+            var length = eventData.data.filter(function (v) {
+                return v.obj.Magnitud === magnitudes[i];
+            }).length;
+            divider += length;
+            sum += magnitudes[i] * length;
+        }
+
+        average = (Math.round((sum / divider) * 100) / 100).toFixed(2);
+    }
+    console.log(average);
+
     return {
         'min': min,
         'max': max,
         'Historic': value,
-        'value': final
+        'value': final,
+        'mag': average
     }
 }
 
 
 function drawEnlargedVolcanoData(Svg, volcano_name, box) {
     // console.log(P_volcano_data[volcano_name].events);
-    var vlcn = P_volcano_data[volcano_name].events;
+    var evt = P_volcano_data[volcano_name].events;
     sortedEdadEventsData = {};
     noEdad = {};
     var minMaXValues = [];
-    for (var i = 0; i < vlcn.length; i++) {
+    avgMagnitudeforEvent = {};
+    for (var i = 0; i < evt.length; i++) {
 
-        // filterEdad(volcano_name, vlcn[i])
-        var p = filterEdad(volcano_name, vlcn[i]);
+        // filterEvents(volcano_name, evt[i])
+        var p = filterEvents(volcano_name, evt[i]);
         minMaXValues.push(p);
+        avgMagnitudeforEvent[evt[i]] = p.mag;
         if (p.value === 0) {
-            noEdad[vlcn[i]] = p.value;
+            noEdad[evt[i]] = p.value;
         }
         else {
-            sortedEdadEventsData[p.value] = vlcn[i]
+            sortedEdadEventsData[p.value] = evt[i];
         }
     }
+
+    console.log(avgMagnitudeforEvent);
 
     var properties = {
         'radius': 60,
@@ -270,74 +309,108 @@ function drawEnlargedVolcanoData(Svg, volcano_name, box) {
         'color': "blue",
         'radiusMultiplier': 15
     };
-    console.log(noEdad);
-    console.log(sortedEdadEventsData);
 
 
-    for (var j = 0; j < Object.keys(sortedEdadEventsData).length; j++) {
-        console.log("in the loop ");
-        Svg.append("circle")
-            .attr("cx", box.width / 2)
-            .attr("cy", box.height / 2)
-            .attr("r", properties.radius + (j * properties.radiusMultiplier))
-            .attr("fill", "none")
-            .attr("stroke-width", properties.width)
-            .attr("stroke", properties.color)
-            .attr("id", "fullView*"+sortedEdadEventsData[Object.keys(sortedEdadEventsData)[j]]);
+    drawSortedEdadEvents(Svg, box, properties);
 
-        var eve = document.getElementById("fullView*"+sortedEdadEventsData[Object.keys(sortedEdadEventsData)[j]]);
+    drawNoEdadEvents(Svg, box, properties, volcano_name);
 
-        eve.addEventListener('mouseover', function (e) {
-            console.log("on Hover");
-            console.log(this);
-            var elm = d3.select("." + $.escapeSelector(this.id));
-            elm.attr("stroke", "green");
-            var target = '#popbox'
-            $(target).css({ 'top': e.pageY + 10, 'left': e.pageX + 20, 'position': 'absolute', 'border': '1px solid black', 'padding': '5px' });
-            $(target).html(this.id.split('*')[1] + `<br>`+ `<b> Edad : `+ Object.keys(sortedEdadEventsData).find(key => sortedEdadEventsData[key] === this.id.split('*')[1]) +`</b>`);
-            $(target).show();
-        });
+}
 
-        eve.addEventListener('mouseout', function () {
-            console.log("on exit");
-            var target = '#popbox';
-            $(target).hide();
-        });
-
+function getMagnitudeColor(mag) {
+    if (mag !== undefined) {
+        var m = parseFloat(mag);
+        switch (true) {
+            case (m >= 0 && m < 1):
+                return "#CC28CA";
+                break;
+            case (m >= 1 && m < 2):
+                return "#9028CC";
+                break;
+            case (m >= 2 && m < 3):
+                return "#DAF7A6";
+                break;
+            case (m >= 3 && m < 4):
+                return "#FFC300";
+                break;
+            case (m >= 4 && m < 5):
+                return "#FF5733";
+                break;
+            case (m >= 5 && m < 6):
+                return "#C70039";
+                break;
+            case (m >= 6 && m < 7):
+                return "#900C3F";
+                break;
+            case (m >= 7 && m < 8):
+                return "#581845";
+                break;
+            case (m >= 8 && m < 9):
+                return "#22050B";
+                break;
+            default:
+                return "#AEABAB";
+                break;
+        }
     }
+    return "#AEABAB";
+}
 
+function drawNoEdadEvents(Svg, box, properties, volcano_name) {
     for (var k = 0; k < Object.keys(noEdad).length; k++) {
         Svg.append("circle")
             .attr("cx", box.width / 2)
             .attr("cy", box.height / 2)
             .attr("r", properties.radius + ((k + Object.keys(sortedEdadEventsData).length) * properties.radiusMultiplier))
             .attr("fill", "none")
+            .attr("filter", "url(#blur-" + volcano_name + ")")
             .attr("stroke-width", properties.width)
-            .attr("id", "fullView*"+Object.keys(noEdad)[k])
-            .attr("stroke", 'black');
-
-        var eve = document.getElementById("fullView*"+Object.keys(noEdad)[k]);
-
+            .attr("id", "fullView*" + Object.keys(noEdad)[k])
+            .attr("stroke", getMagnitudeColor(avgMagnitudeforEvent[Object.keys(noEdad)[k]]));
+        var eve = document.getElementById("fullView*" + Object.keys(noEdad)[k]);
         eve.addEventListener('mouseover', function (e) {
-            console.log("on Hover");
-            console.log(this);
+
             var elm = d3.select("." + $.escapeSelector(this.id));
             elm.attr("stroke", "green");
-            var target = '#popbox'
+            var target = '#popbox';
             $(target).css({ 'top': e.pageY + 10, 'left': e.pageX + 20, 'position': 'absolute', 'border': '1px solid black', 'padding': '5px' });
-            $(target).html(this.id.split('*')[1] + `<br>`+ `<b> Edad : `+ Object.keys(noEdad).find(key => noEdad[key] === this.id.split('*')[1]) +`</b>`);
+            $(target).html(this.id.split('*')[1] + `<br>` + `<b> Edad : ` + Object.keys(noEdad).find(key => noEdad[key] === this.id.split('*')[1]) + `</b>` +
+                `<br>` + `<b> Magnitude : ` + avgMagnitudeforEvent[this.id.split('*')[1]] + `</b>`);
             $(target).show();
         });
-
         eve.addEventListener('mouseout', function () {
-            console.log("on exit");
             var target = '#popbox';
             $(target).hide();
         });
     }
-
 }
 
+function drawSortedEdadEvents(Svg, box, properties) {
+    for (var j = 0; j < Object.keys(sortedEdadEventsData).length; j++) {
+        Svg.append("circle")
+            .attr("cx", box.width / 2)
+            .attr("cy", box.height / 2)
+            .attr("r", properties.radius + (j * properties.radiusMultiplier))
+            .attr("fill", "none")
+            .attr("stroke-width", properties.width)
+            .attr("stroke", getMagnitudeColor(avgMagnitudeforEvent[sortedEdadEventsData[Object.keys(sortedEdadEventsData)[j]]]))
+            .attr("id", "fullView*" + sortedEdadEventsData[Object.keys(sortedEdadEventsData)[j]]);
+        var eve = document.getElementById("fullView*" + sortedEdadEventsData[Object.keys(sortedEdadEventsData)[j]]);
+        eve.addEventListener('mouseover', function (e) {
+            var elm = d3.select("." + $.escapeSelector(this.id));
+            elm.attr("stroke", "green");
+            var target = '#popbox';
+            $(target).css({ 'top': e.pageY + 10, 'left': e.pageX + 20, 'position': 'absolute', 'border': '1px solid black', 'padding': '5px' });
+            $(target).html(this.id.split('*')[1] + `<br>` + `<b> Edad : ` + Object.keys(sortedEdadEventsData).find(key => sortedEdadEventsData[key] === this.id.split('*')[1]) + `</b>`
+                + `<br>` + `<b> Magnitude : ` + avgMagnitudeforEvent[this.id.split('*')[1]] + `</b>`);
+            $(target).show();
+        });
+        eve.addEventListener('mouseout', function () {
+            var target = '#popbox';
+            $(target).hide();
+        });
+    }
+}
 
 //var columnCount=0;
 function showVolcanicData(volcano_name, index) {
@@ -406,7 +479,7 @@ function drawEventCircles(Svg, volcano_name) {
     //console.log(P_volcano_data[volcano_name].events);
     var radius = 10;
     var stroke_width = 0;
-    var stroke_color = "red";
+    var stroke_color = "grey";
     var radiusMultiplier = 10;
     if (P_volcano_data[volcano_name].events.length < 4) {
         radius = 25;
@@ -447,8 +520,6 @@ function drawEventCircles(Svg, volcano_name) {
         var eve = document.getElementById(event_name);
 
         eve.addEventListener('mouseover', function (e) {
-            console.log("on Hover");
-            console.log(this);
             var elm = d3.select("." + $.escapeSelector(this.id));
             elm.attr("stroke", "green");
             var target = '#popbox'
@@ -458,7 +529,6 @@ function drawEventCircles(Svg, volcano_name) {
         });
 
         eve.addEventListener('mouseout', function () {
-            console.log("on exit");
             var target = '#popbox';
             $(target).hide();
         });
@@ -578,7 +648,14 @@ function setup() {
                     </div>
                     `;
 
-            // <button onclick="showVolcanicData('${volcano_data[i].id}','${i}')">Show More Data</button>
+            var volcanoIcon = L.icon({
+                iconUrl: '../svg/volcano.jpg',
+
+                iconSize: [38, 38], // size of the icon
+                iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+                popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+            });
+
             new L.marker([lat, lon]).addTo(mymap)
                 .bindPopup(volcano).on('click', function (e) { console.log("clicked (Try to open Accordion): " + e.target) });
             ;
