@@ -44,6 +44,7 @@
 .card {
   border: 1px solid #d3d3d3;
   border-radius: .25rem;
+  padding: 8px;
 }
 
 .volcanoEvents {
@@ -70,6 +71,7 @@ button {
   grid-template-columns: repeat(4, 300px);
   grid-auto-rows: auto;
   grid-gap: 20px;
+  padding-left: 42px;
 }
 /* 
 .event:hover{
@@ -82,10 +84,8 @@ button {
 }
 
 .volcano-visual{
-  border-color: #000000;
+  border: 2px solid #000000;
   border-radius: 5px;
-  border-width: 3px;
-  background: rgb(216, 216, 216);
   height: 555px;
 }
 
@@ -93,13 +93,11 @@ button {
   display: none;
   margin :20px;
   width: 100%;
+  padding-left: 15px;
 }
 
 .volcano-data{
-  border-color: #000000;
-  border-radius: 6px;
-  border-width: 1px;
-  background: rgb(235, 235, 235);
+  background: rgb(97, 97, 97);
   height: 555px;
   text-align: center;
 }
@@ -121,6 +119,10 @@ button {
 .dropdown-menu{
   max-height: 300px;
     overflow-y: scroll;
+}
+
+#mapid {
+  height: 604px; 
 }
 
 .tephra-map .leaflet-popup-content-wrapper {

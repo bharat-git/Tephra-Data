@@ -26,14 +26,14 @@
 
 </head>
 
-<body>
+<body style="width: 1334px;">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#">Tephra Data</a>
         <div class="btn-group btn-group-toggle toggle-btn" data-toggle="buttons">
             <label class="btn btn-secondary active" onclick="ShowMapView()">
                 <input type="radio" name="options" id="mapView" autocomplete="off" checked> Map
             </label>
-            <label class="btn btn-secondary" onclick="ShowListView()">
+            <label class="btn btn-secondary mark" onclick="ShowListView()">
                 <input type="radio" name="options" id="listView" autocomplete="off">List
             </label>
         </div>
@@ -51,9 +51,11 @@
     <div class="row">
         <div id="dashboard" class="">
             <div class="row ">
-                <div class="alert alert-primary legend" role="alert">
-                    <b>NOTE :</b> Each Volcano card has concentric circles, each representing the events
-                    <b>(evento)</b> based on that volcano.
+                <div style="padding-left: 57px;">
+                    <div class="alert alert-primary legend">
+                        <b>NOTE :</b> Each Volcano card has concentric circles, each representing the events
+                        <b>(evento)</b> based on that volcano.
+                    </div>
                 </div>
             </div>
             <div class="card-grid">
@@ -71,7 +73,7 @@
         </div>
         <div class="column tephra-map" id="mapid"></div>
         <div id="VolcanoView" class "container">
-            <div class="row ">
+            <!-- <div class="row ">
                 <div class="col-lg-6">
                     <div class="alert alert-primary" role="alert">
                         <p>
@@ -80,7 +82,7 @@
                                 <li>Each circle represents an
                                     <b>evento</b>
                                 </li>
-                                <!-- <li>The <b>Width</b> of the stroke represents the <b>no. of samples </b> in that event</li> -->
+                                <li>The <b>Width</b> of the stroke represents the <b>no. of samples </b> in that event</li>
                                 <li>The
                                     <b>Color</b> of the stroke represents the
                                     <b>magnitude </b> of that event</li>
@@ -97,111 +99,22 @@
                             <strong> Radius : </strong>
                             <ul>
                                 <li>
-                                    The events/circles which are <b>Blurred</b> are the one's with <b>Edad = undefined</b>.
+                                    The events/circles which are
+                                    <b>Blurred</b> are the one's with
+                                    <b>Edad = undefined</b>.
                                     <small>
-                                        <i>(All the values are shown from the current year, e.g. xxx Radiocarbon ages ago from this year . For samples with different Radiocarbon ages the highest value is considered)</i>
+                                        <i>(All the values are shown from the current year, e.g. xxx Radiocarbon ages ago from
+                                            this year . For samples with different Radiocarbon ages the highest value is
+                                            considered)
+                                        </i>
                                     </small>
                                 </li>
                             </ul>
                             <strong> Stroke Color : </strong>
-                            <div class="row">
-                                <div class="col-md-1">
-
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="color" style="background-color: #CC28CA">
-
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="color" style="background-color: #9028CC">
-
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="color" style="background-color: #DAF7A6">
-
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="color" style="background-color: #FFC300">
-
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="color" style="background-color: #FF5733">
-
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="color" style="background-color: #C70039">
-
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="color" style="background-color: #900C3F">
-
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="color" style="background-color: #581845">
-
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="color" style="background-color: #22050B">
-
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="color" style="background-color: #AEABAB">
-
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-1">
-                                    
-                                </div>
-                                <div class="col-md-1">
-                                        <small> 0-.99</small>
-                                </div>
-                                <div class="col-md-1">
-                                        <small>1-1.99</small>  
-                                </div>
-                                <div class="col-md-1">
-                                    <small>    2-2.99</small>  
-                                </div>
-                                <div class="col-md-1">
-                                    <small>   3-3.99</small>  
-                                </div>
-                                <div class="col-md-1">
-                                    <small>    4-4.99</small>  
-                                </div>
-                                <div class="col-md-1">
-                                    <small>   5-5.99</small>  
-                                </div>
-                                <div class="col-md-1">
-                                    <small>  6-6.99</small>  
-                                </div>
-                                <div class="col-md-1">
-                                    <small>   7-7.99</small>  
-                                </div>
-                                <div class="col-md-1">
-                                    <small>    8 <  </small>  
-                                </div>
-                                <div class="col-md-1">
-                                    <small>   undefined </small>  
-                                </div>
-
-                            </div>
-
-
-
                         </p>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <div class="row">
                 <div class="col-lg-8 ">
                     <div class="volcano-visual">
@@ -213,6 +126,124 @@
                         <div class="card-data">
 
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 15px">
+                <div class="col-md-2" style="margin-left: 15px">
+                            <div class="row">
+                                <div class="col-md-3" style="border-top: 3px solid grey;"></div>
+                                <div class="col-md-9">Known age 
+                                        <small>
+                                                <i style="font-size: 10px">(For samples with diff. ages the highest value is considered)
+                                                </i>
+                                            </small>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3" style="border-top: 3px dashed grey "></div>
+                                <div class="col-md-9">Unknown age</div>
+                            </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-1">
+
+                        </div>
+                        Magnitude of Eruption
+                    </div>
+                    <div class="row" style="height: 6px"></div>
+                    <div class="row">
+                        <div class="col-md-1">
+
+                        </div>
+                        <div class="col-md-1">
+                            <div class="color" style="background-color: #CC28CA">
+
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="color" style="background-color: #9028CC">
+
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="color" style="background-color: #DAF7A6">
+
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="color" style="background-color: #FFC300">
+
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="color" style="background-color: #FF5733">
+
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="color" style="background-color: #C70039">
+
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="color" style="background-color: #900C3F">
+
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="color" style="background-color: #581845">
+
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="color" style="background-color: #22050B">
+
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="color" style="background-color: #AEABAB">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-1">
+
+                        </div>
+                        <div class="col-md-1">
+                            <small> 0-.99</small>
+                        </div>
+                        <div class="col-md-1">
+                            <small>1-1.99</small>
+                        </div>
+                        <div class="col-md-1">
+                            <small> 2-2.99</small>
+                        </div>
+                        <div class="col-md-1">
+                            <small> 3-3.99</small>
+                        </div>
+                        <div class="col-md-1">
+                            <small> 4-4.99</small>
+                        </div>
+                        <div class="col-md-1">
+                            <small> 5-5.99</small>
+                        </div>
+                        <div class="col-md-1">
+                            <small> 6-6.99</small>
+                        </div>
+                        <div class="col-md-1">
+                            <small> 7-7.99</small>
+                        </div>
+                        <div class="col-md-1">
+                            <small> 8
+                                < </small>
+                        </div>
+                        <div class="col-md-1">
+                            <small> undefined </small>
+                        </div>
+
                     </div>
                 </div>
             </div>
