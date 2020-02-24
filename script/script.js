@@ -221,8 +221,17 @@ function showFullViewOfVolcano(volcano_name) {
 }
 
 function populateDataOnCard(volcano_name) {
-    d3.select(".card-data").html(volcano_name);
-
+    var events = P_volcano_data[volcano_name].events;
+    console.log(events);
+    var card = d3.select(".card-data").html("<b>"+volcano_name+"</b>");
+    var events_scroll = card.append("div")
+        .attr("class", "scroll-card")
+        .html("<b>events List </b>:");
+    for (var i = 0; i < events.length; i++) {
+        events_scroll.append("div")
+            .attr("class", "row")
+            .html(events[i]);
+    }
 
 
 }
@@ -317,12 +326,12 @@ function setCircleProperties(volcano_name) {
     var properties = {};
     if (P_volcano_data[volcano_name].events.length < 4) {
         properties.radius = 60;
-        properties.width = 25;
+        properties.width = 10;
         properties.radiusMultiplier = 40;
     }
     else if (P_volcano_data[volcano_name].events.length < 8) {
         properties.radius = 60;
-        properties.width = 15;
+        properties.width = 10;
         properties.radiusMultiplier = 25;
     }
     else if (P_volcano_data[volcano_name].events.length < 15) {
@@ -385,7 +394,7 @@ function drawNoEdadEvents(Svg, box, properties, volcano_name) {
             .attr("r", properties.radius + ((k + Object.keys(sortedEdadEventsData).length) * properties.radiusMultiplier))
             .attr("fill", "none")
             //.attr("filter", "url(#blur-" + volcano_name + ")")
-            .attr("stroke-dasharray",3)
+            .attr("stroke-dasharray", 3)
             .attr("stroke-width", properties.width)
             .attr("id", "fullView*" + Object.keys(noEdad)[k])
             .attr("stroke", getMagnitudeColor(avgMagnitudeforEvent[Object.keys(noEdad)[k]]));

@@ -125,6 +125,14 @@ button {
   height: 604px; 
 }
 
+.scroll-card{
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100px;
+  width: 200px;
+  padding-left: 30px;
+}
+
 .tephra-map .leaflet-popup-content-wrapper {
   background:#2c3e50;
   color:#fff;
