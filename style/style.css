@@ -36,6 +36,11 @@
   width : max-content;
 }
 
+.color{
+  height: 20px;
+  
+}
+
 .card {
   border: 1px solid #d3d3d3;
   border-radius: .25rem;
@@ -94,7 +99,7 @@ button {
   border-color: #000000;
   border-radius: 6px;
   border-width: 1px;
-  background: rgb(73, 72, 72);
+  background: rgb(235, 235, 235);
   height: 555px;
   text-align: center;
 }

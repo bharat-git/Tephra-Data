@@ -191,6 +191,8 @@ function showFullViewOfVolcano(volcano_name) {
 
     d3.selectAll("#volcanic_data_visual").remove();
 
+    d3.select(".mark").classed('active', false);
+
     var box = d3.select(".volcano-visual").node().getBoundingClientRect();
     var Svg = d3.select(".volcano-visual").append("svg")
         .attr("id", "volcanic_data_visual")
@@ -219,6 +221,8 @@ function showFullViewOfVolcano(volcano_name) {
 }
 
 function populateDataOnCard(volcano_name) {
+
+    d3.select(".card-data").html(volcano_name);
 
 
 }
@@ -303,18 +307,35 @@ function drawEnlargedVolcanoData(Svg, volcano_name, box) {
 
     console.log(avgMagnitudeforEvent);
 
-    var properties = {
-        'radius': 60,
-        'width': 10,
-        'color': "blue",
-        'radiusMultiplier': 15
-    };
+    drawSortedEdadEvents(Svg, box, setCircleProperties(volcano_name));
 
+    drawNoEdadEvents(Svg, box, setCircleProperties(volcano_name), volcano_name);
 
-    drawSortedEdadEvents(Svg, box, properties);
+}
 
-    drawNoEdadEvents(Svg, box, properties, volcano_name);
-
+function setCircleProperties(volcano_name) {
+    var properties ={};
+    if (P_volcano_data[volcano_name].events.length < 4) {
+        properties.radius = 60;
+        properties.width = 25;
+        properties.radiusMultiplier = 40;
+    }
+    else if (P_volcano_data[volcano_name].events.length < 8) {
+        properties.radius = 60;
+        properties.width = 15;
+        properties.radiusMultiplier = 25;
+    }
+    else if (P_volcano_data[volcano_name].events.length < 15) {
+        properties.radius = 30;
+        properties.width = 10;
+        properties.radiusMultiplier = 20;
+    }
+    else {
+        properties.radius = 10;
+        properties.width = 5;
+        properties.radiusMultiplier = 10;
+    }
+    return properties;
 }
 
 function getMagnitudeColor(mag) {
