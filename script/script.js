@@ -206,7 +206,7 @@ function showFullViewOfVolcano(volcano_name) {
         .attr("id", "blur-" + volcano_name);
 
     filter.append("feGaussianBlur")
-        .attr("stdDeviation", 3);
+        .attr("stdDeviation", 3.5);
 
     Svg.append("circle")
         .attr("cx", box.width / 2)
@@ -221,8 +221,8 @@ function showFullViewOfVolcano(volcano_name) {
 }
 
 function populateDataOnCard(volcano_name) {
-
     d3.select(".card-data").html(volcano_name);
+
 
 
 }
@@ -314,7 +314,7 @@ function drawEnlargedVolcanoData(Svg, volcano_name, box) {
 }
 
 function setCircleProperties(volcano_name) {
-    var properties ={};
+    var properties = {};
     if (P_volcano_data[volcano_name].events.length < 4) {
         properties.radius = 60;
         properties.width = 25;
@@ -384,7 +384,8 @@ function drawNoEdadEvents(Svg, box, properties, volcano_name) {
             .attr("cy", box.height / 2)
             .attr("r", properties.radius + ((k + Object.keys(sortedEdadEventsData).length) * properties.radiusMultiplier))
             .attr("fill", "none")
-            .attr("filter", "url(#blur-" + volcano_name + ")")
+            //.attr("filter", "url(#blur-" + volcano_name + ")")
+            .attr("stroke-dasharray",3)
             .attr("stroke-width", properties.width)
             .attr("id", "fullView*" + Object.keys(noEdad)[k])
             .attr("stroke", getMagnitudeColor(avgMagnitudeforEvent[Object.keys(noEdad)[k]]));
@@ -669,6 +670,13 @@ function setup() {
                     </div>
                     `;
 
+            // xhr = new XMLHttpRequest();
+            // xhr.open("GET", "../svg/volcano.svg", false);
+            // xhr.overrideMimeType("image/svg+xml");
+            // xhr.send("");
+
+            // xhr.responseXML.documentElement
+
             var volcanoIcon = L.icon({
                 iconUrl: '../svg/volcano.jpg',
 
@@ -676,6 +684,8 @@ function setup() {
                 iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
                 popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
             });
+
+
 
             new L.marker([lat, lon]).addTo(mymap)
                 .bindPopup(volcano).on('click', function (e) { console.log("clicked (Try to open Accordion): " + e.target) });
