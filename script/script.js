@@ -220,6 +220,30 @@ function showFullViewOfVolcano(volcano_name) {
 
 }
 
+function showEventData(selected, volcano_name){
+    var event_name = selected.value;
+    console.log(event_name);
+    d3.selectAll(".chip").remove(); 
+    d3.selectAll(".written-data").remove();
+    var eventData = P_volcano_data[volcano_name].eventsData[event_name];
+    var SecciónList = P_volcano_data[volcano_name].eventsData[event_name].Seccións;
+    // write the event data on the html ....... 
+    var card = d3.select(".card-data").append("div")
+    .attr("class","scroll-chips");
+    for(var i=0; i< SecciónList.length; i++){
+        card.append("a")
+        .attr("class", "chip")
+        .html(SecciónList[i]);
+    }
+
+    var written_data = d3.select(".card-data").append("div")
+    .attr("class","written-data");
+
+    written_data.append("div").html("<b>Tipo De Sección </b>: "+ eventData.data[0].obj.TipoDeSección);
+    written_data.append("div").html("<b>Sample ID </b>: "+ eventData.data[0].obj.SampleID);
+    written_data.append("div").html("<b>Sample Point </b>: "+ eventData.data[0].obj.SamplePoint);
+}
+
 function populateDataOnCard(volcano_name) {
     var events = P_volcano_data[volcano_name].events;
     console.log(events);
@@ -227,13 +251,16 @@ function populateDataOnCard(volcano_name) {
     var events_scroll = card.append("div")
         .attr("class", "scroll-card")
         .html("<b>events List </b>:");
+    var scroll= events_scroll.append("select")
+    .attr("onchange","showEventData(this, " + "'" + volcano_name + "'" +")");
+    scroll.append("option")
+    .attr("value", "default")
+    .html("<--select-->")
     for (var i = 0; i < events.length; i++) {
-        events_scroll.append("div")
-            .attr("class", "row")
+        scroll.append("option")
+            .attr("value", events[i])
             .html(events[i]);
     }
-
-
 }
 
 function filterEvents(volcano_name, eventName) {
@@ -394,7 +421,7 @@ function drawNoEdadEvents(Svg, box, properties, volcano_name) {
             .attr("r", properties.radius + ((k + Object.keys(sortedEdadEventsData).length) * properties.radiusMultiplier))
             .attr("fill", "none")
             //.attr("filter", "url(#blur-" + volcano_name + ")")
-            .attr("stroke-dasharray", 3)
+            .attr("stroke-dasharray", "18,2")
             .attr("stroke-width", properties.width)
             .attr("id", "fullView*" + Object.keys(noEdad)[k])
             .attr("stroke", getMagnitudeColor(avgMagnitudeforEvent[Object.keys(noEdad)[k]]));
