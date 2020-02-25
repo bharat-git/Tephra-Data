@@ -176,10 +176,20 @@ function showEventData(selected, volcano_name) {
     // write the event data on the html ....... 
     var card = d3.select(".card-data").append("div")
         .attr("class", "scroll-chips");
+    var seccionData ={};
     for (var i = 0; i < SecciónList.length; i++) {
+        var seccionlist = [];
         card.append("a")
             .attr("class", "chip")
             .html(SecciónList[i]);
+
+        eventData.data.filter(function (v) {
+            console.log(v);
+            if (v.obj.Sección === SecciónList[i]) {
+                seccionlist.push(v);
+            }
+        });
+        seccionData[SecciónList[i]] = seccionlist;
     }
 
     var written_data = d3.select(".card-data").append("div")
